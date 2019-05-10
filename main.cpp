@@ -4,6 +4,7 @@
 
  #include <iostream>
  #include <stdio.h>
+ #include <fstream>
 
  using namespace std;
  using namespace cv;
@@ -19,9 +20,24 @@
  string window_name = "Capture - Face detection";
  RNG rng(12345);
 
+std::ofstream arduino;
+
  /** @function main */
  int main( int argc, const char** argv )
  {
+
+
+
+        //open arduino device file (linux)
+        
+        arduino.open( "/dev/ttyACM0");
+
+        //write to it
+        arduino << "Hello from C++!";
+        
+
+
+
    CvCapture* capture;
    Mat frame;
 
@@ -48,6 +64,10 @@
       }
    }
    return 0;
+  arduino.close();
+  
+  
+  
  }
 
 /** @function detectAndDisplay */
@@ -64,10 +84,88 @@ void detectAndDisplay( Mat frame )
 
   for( size_t i = 0; i < faces.size(); i++ )
   { 
-    int x = faces[i].x + faces[i].width*0.5;
-    int y = faces[i].y + faces[i].height*0.5;
-    int z = ( faces[i].width + faces[i].height ) / 2;
-    std::cout << "X-->" << x << "      Y-->" << y << "      z-->" << z << std::endl;
+    
+    string Json = "[{";
+    
+    int Ejex = faces[i].x + faces[i].width*0.5;
+    int Ejey = faces[i].y + faces[i].height*0.5;
+    int Ejez = ( faces[i].width + faces[i].height ) / 2;
+
+    
+stringstream ss;
+ss << Ejex;
+string StrEjex = ss.str();
+
+stringstream cc;
+cc << Ejey;
+string StrEjey = cc.str();
+
+stringstream dd;
+dd << Ejez;
+string StrEjez = dd.str();
+
+
+	Json = Json + "\"x\":\"" + StrEjex + "\",\"y\":\"" + StrEjey + "\",\"z\":\"" + StrEjez + "\"}";
+
+	
+
+	
+	
+	
+if ( faces.size() == 2)
+{
+    int Ejex2 = faces[2].x + faces[2].width*0.5;
+    int Ejey2 = faces[2].y + faces[2].height*0.5;
+    int Ejez2 = ( faces[2].width + faces[2].height ) / 2;
+
+    
+stringstream ee;
+ee << Ejex2;
+string StrEjex = ee.str();
+
+stringstream ff;
+ff << Ejey2;
+string StrEjey = ff.str();
+
+stringstream gg;
+gg << Ejez2;
+string StrEjez = gg.str();
+   Json = Json + ",{\"x\":\"" + StrEjex + "\",\"y\":\"" + StrEjey + "\",\"z\":\"" + StrEjez + "\"}";
+ 
+}
+
+
+
+if ( faces.size() == 3)
+{
+    int Ejex2 = faces[3].x + faces[3].width*0.5;
+    int Ejey2 = faces[3].y + faces[3].height*0.5;
+    int Ejez2 = ( faces[3].width + faces[3].height ) / 2;
+
+    
+stringstream gg;
+gg << Ejex2;
+string StrEjex = gg.str();
+
+stringstream ii;
+ii << Ejey2;
+string StrEjey = ii.str();
+
+stringstream yy;
+yy << Ejez2;
+string StrEjez = yy.str();
+   Json = Json + ",{\"x\":\"" + StrEjex + "\",\"y\":\"" + StrEjey + "\",\"z\":\"" + StrEjez + "\"}";
+ 
+}	
+
+
+	
+	
+	Json = Json + "]";
+        std::cout << Json << std::endl;	
+	
+	
+   // std::cout << "X-->" << Ejex << "      Y-->" << Ejey << "      z-->" << Ejez << std::endl;
     Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
     ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
 
@@ -88,5 +186,8 @@ void detectAndDisplay( Mat frame )
   }
   //-- Show what you got
   imshow( window_name, frame );
+  
+  
+  
  }
 
